@@ -45,7 +45,6 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
-    controller.setStamp();
 
     return Scaffold(
       appBar: AppBar(
@@ -53,7 +52,7 @@ class HomeScreen extends StatelessWidget {
         backgroundColor: Colors.green,
         actions: [
           IconButton(icon: const Icon(Icons.dark_mode_outlined), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.person_outline), onPressed: () => Get.to(() => const UserScreen())),
+          IconButton(icon: const Icon(Icons.person_outline), onPressed: () {}),
           IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
           const SizedBox(width: 10),
         ],
@@ -92,7 +91,9 @@ class InfoScreen extends StatelessWidget {
     final controller = Get.find<HomeController>();
     final lottoController = Get.find<LottoController>();
     controller.setStamp();
-    controller.setMessage('lotto');
+    if (controller.msg.value != 'user') {
+      controller.setMessage('lotto');
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -112,8 +113,8 @@ class InfoScreen extends StatelessWidget {
             child: Column(
               children: [
                 const SizedBox(height: 20),
-                Text(controller.msg.value),
-                Text(controller.timeStamp.value),
+                Obx(() => Text(controller.msg.value)),
+                Obx(() => Text(controller.timeStamp.value)),
                 const SizedBox(height: 20),
                 Obx(() => Text('results: ${lottoController.lottoData.length.toString()}')),
                 Obx(() {
@@ -267,6 +268,9 @@ class UserScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final controller = Get.find<HomeController>();
+    final MediaQueryData mediaQueryData = MediaQuery.of(context);
+
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(child: const Text('@xipspace'), onTap: () => Get.offAll(() => const HomeScreen())),
@@ -277,6 +281,43 @@ class UserScreen extends StatelessWidget {
           IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
           const SizedBox(width: 10),
         ],
+      ),
+      body: Center(
+        child: Column(
+          children: [
+            const SizedBox(height: 20),
+
+            // Obx(() => Text(controller.userState.value.toString())),
+            Obx(() => Text(controller.msg.value)),
+            Obx(() => Text(controller.timeStamp.value)),
+            // Obx(() => Text('isLogged: ${controller.isLogged}')),
+            // Obx(() => Text(controller.userIsLogged.value.toString())),
+
+            const SizedBox(height: 20),
+            const Text('device info'),
+            const SizedBox(height: 20),
+            Text('Screen Size: ${mediaQueryData.size.width} x ${mediaQueryData.size.height}'),
+            Text('Orientation: ${mediaQueryData.orientation}'),
+            Text('Device Pixel Ratio: ${mediaQueryData.devicePixelRatio}'),
+            Text('Device Theme: ${mediaQueryData.platformBrightness}'),
+
+            Text('GetX isDarkMode: ${Get.isDarkMode}'),
+            // Obx(() => Text('isLight: ${controller.isLight}')),
+            // width: Get.width * 0.95,
+            // height: Get.height * 0.95,
+
+            const SizedBox(height: 20),
+          ],
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          controller.setStamp();
+          // controller.isLogged.toggle();
+          // controller.isLogged.value ? controller.setMsg('user') : controller.setMsg('guest');
+          controller.setMessage('user');
+        },
       ),
     );
   }

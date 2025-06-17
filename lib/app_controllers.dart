@@ -16,6 +16,13 @@ class HomeController extends GetxController {
   void setMessage(text) {
     msg.value = text;
   }
+
+  @override
+  void onInit() {
+    super.onInit();
+    setStamp();
+  }
+
 }
 
 enum ViewMode { frequencyTable, frequencyRanking, groupRanking, sequenceTiers }
