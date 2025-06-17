@@ -273,7 +273,7 @@ class UserScreen extends StatelessWidget {
         backgroundColor: Colors.green,
         actions: [
           IconButton(icon: const Icon(Icons.dark_mode_outlined), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.person_outline), onPressed: () => Get.to(() => const UserScreen())),
+          IconButton(icon: const Icon(Icons.person_outline), onPressed: () {}),
           IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
           const SizedBox(width: 10),
         ],
