@@ -19,7 +19,8 @@ class HomeController extends GetxController {
   }
 }
 
-enum ViewMode { frequencyTable, frequencyRanking, groupRanking }
+enum ViewMode { frequencyTable, frequencyRanking, groupRanking, sequenceTiers }
+
 enum TimeFilter { allTime, oneMonth, sixMonths, oneYear, fiveYears }
 
 class LottoController extends GetxController {
@@ -49,6 +50,9 @@ class LottoController extends GetxController {
         break;
       case ViewMode.groupRanking:
         computeGroupRanking();
+        break;
+      case ViewMode.sequenceTiers: // ← NEW
+        computeSequenceTiers();
         break;
     }
   }
@@ -189,7 +193,50 @@ class LottoController extends GetxController {
     updateLottoBanner(output.toString());
   }
 
+  void computeSequenceTiers() {
+    final Map<String, int> tierCounts = {
+      't6': 0,
+      't5': 0,
+      't4': 0,
+      't3': 0,
+      't2': 0,
+    };
 
+    for (var draw in _filteredData()) {
+      final list = draw.results;
+      if (list.length < 2) continue;
+
+      int maxStreak = 1;
+      int currentStreak = 1;
+
+      for (int i = 1; i < list.length; i++) {
+        if (list[i] == list[i - 1] + 1) {
+          currentStreak++;
+          if (currentStreak > maxStreak) {
+            maxStreak = currentStreak;
+          }
+        } else {
+          currentStreak = 1;
+        }
+      }
+
+      if (maxStreak >= 2) {
+        final tier = maxStreak > 6 ? 't6' : 't$maxStreak';
+        tierCounts[tier] = tierCounts[tier]! + 1;
+      }
+    }
+
+    final output = StringBuffer();
+    output.write('Draws with sequences of consecutive numbers:');
+    for (var tier in ['t6', 't5', 't4', 't3', 't2']) {
+      final count = tierCounts[tier];
+      if (count! > 0) {
+        output.write('\n$tier: $count');
+      }
+    }
+
+    updateLottoBanner(output.toString());
+  }
 
   void loadLottoResults() async {
     try {

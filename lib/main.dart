@@ -167,6 +167,10 @@ class InfoScreen extends StatelessWidget {
                                 value: ViewMode.groupRanking,
                                 child: Text('Group Ranking'),
                               ),
+                              DropdownMenuItem(
+                                value: ViewMode.sequenceTiers,
+                                child: Text('Sequence Tiers'),
+                              ),
                             ],
                             onChanged: (value) {
                               if (value != null) {
