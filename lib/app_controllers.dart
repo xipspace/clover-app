@@ -227,11 +227,15 @@ class LottoController extends GetxController {
     }
 
     final output = StringBuffer();
-    output.write('Draws with sequences of consecutive numbers:');
+    bool first = true;
     for (var tier in ['t6', 't5', 't4', 't3', 't2']) {
       final count = tierCounts[tier];
-      if (count! > 0) {
-        output.write('\n$tier: $count');
+      if (count != null && count > 0) {
+        if (!first) {
+          output.write('\n');
+        }
+        output.write('$tier: $count');
+        first = false;
       }
     }
 
