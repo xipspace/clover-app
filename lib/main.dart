@@ -131,56 +131,6 @@ class InfoScreen extends StatelessWidget {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Obx(() {
-                      final current = lottoController.currentView.value;
-                    
-                      return DropdownButtonHideUnderline(
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 1,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.green.shade50,
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: DropdownButton<ViewMode>(
-                            value: current,
-                            icon: const Icon(
-                              Icons.arrow_drop_down,
-                            ),
-                            dropdownColor: Colors.green.shade50,
-                            borderRadius: BorderRadius.circular(12),
-                            style: const TextStyle(
-                              fontSize: 14,
-                            ),
-                            items: const [
-                              DropdownMenuItem(
-                                value: ViewMode.frequencyTable,
-                                child: Text('Frequency by Number'),
-                              ),
-                              DropdownMenuItem(
-                                value: ViewMode.frequencyRanking,
-                                child: Text('Frequency Ranking'),
-                              ),
-                              DropdownMenuItem(
-                                value: ViewMode.groupRanking,
-                                child: Text('Group Ranking'),
-                              ),
-                              DropdownMenuItem(
-                                value: ViewMode.sequenceTiers,
-                                child: Text('Sequence Tiers'),
-                              ),
-                            ],
-                            onChanged: (value) {
-                              if (value != null) {
-                                lottoController.updateView(value);
-                              }
-                            },
-                          ),
-                        ),
-                      );
-                    }),
                     const SizedBox(width: 10),
                     Obx(() {
                       final current = lottoController.currentFilter.value;
@@ -232,6 +182,56 @@ class InfoScreen extends StatelessWidget {
                         ),
                       );
                     }),
+
+                    const SizedBox(width: 10),
+
+                    Obx(() {
+                      final current = lottoController.currentView.value;
+
+                      return DropdownButtonHideUnderline(
+                        child: Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 20,
+                            vertical: 1,
+                          ),
+                          decoration: BoxDecoration(
+                            color: Colors.green.shade50,
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          child: DropdownButton<ViewMode>(
+                            value: current,
+                            icon: const Icon(Icons.arrow_drop_down),
+                            dropdownColor: Colors.green.shade50,
+                            borderRadius: BorderRadius.circular(12),
+                            style: const TextStyle(fontSize: 14),
+                            items: const [
+                              DropdownMenuItem(
+                                value: ViewMode.frequencyTable,
+                                child: Text('Frequency by Number'),
+                              ),
+                              DropdownMenuItem(
+                                value: ViewMode.frequencyRanking,
+                                child: Text('Frequency Ranking'),
+                              ),
+                              DropdownMenuItem(
+                                value: ViewMode.groupRanking,
+                                child: Text('Group Ranking'),
+                              ),
+                              DropdownMenuItem(
+                                value: ViewMode.sequenceTiers,
+                                child: Text('Sequence Tiers'),
+                              ),
+                            ],
+                            onChanged: (value) {
+                              if (value != null) {
+                                lottoController.updateView(value);
+                              }
+                            },
+                          ),
+                        ),
+                      );
+                    }),
+                    const SizedBox(width: 10),
                   ],
                 ),
                 const SizedBox(height: 20),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-
 import 'dart:convert';
 import 'package:flutter/services.dart';
 
@@ -20,7 +19,6 @@ class HomeController extends GetxController {
 }
 
 enum ViewMode { frequencyTable, frequencyRanking, groupRanking, sequenceTiers }
-
 enum TimeFilter { allTime, oneMonth, sixMonths, oneYear, fiveYears }
 
 class LottoController extends GetxController {
@@ -28,6 +26,14 @@ class LottoController extends GetxController {
   RxList<LottoDraw> lottoData = <LottoDraw>[].obs;
   var currentView = ViewMode.frequencyTable.obs;
   var currentFilter = TimeFilter.allTime.obs;
+
+  List<LottoDraw> _cachedFilteredData = [];
+  TimeFilter? _lastUsedFilter;
+
+  String frequencyTableOutput = '';
+  String frequencyRankingOutput = '';
+  String groupRankingOutput = '';
+  String sequenceTiersOutput = '';
 
   @override
   void onInit() {
@@ -43,26 +49,35 @@ class LottoController extends GetxController {
     currentView.value = mode;
     switch (mode) {
       case ViewMode.frequencyTable:
-        lottoStatistics();
+        updateLottoBanner(frequencyTableOutput);
         break;
       case ViewMode.frequencyRanking:
-        computeFrequencyRanking();
+        updateLottoBanner(frequencyRankingOutput);
         break;
       case ViewMode.groupRanking:
-        computeGroupRanking();
+        updateLottoBanner(groupRankingOutput);
         break;
-      case ViewMode.sequenceTiers: // ← NEW
-        computeSequenceTiers();
+      case ViewMode.sequenceTiers:
+        updateLottoBanner(sequenceTiersOutput);
         break;
     }
   }
 
   void updateFilter(TimeFilter filter) {
     currentFilter.value = filter;
+    refreshStatistics();
     updateView(currentView.value);
   }
 
-  List<LottoDraw> _filteredData() {
+  List<LottoDraw> getFilteredData() {
+    if (_lastUsedFilter != currentFilter.value || _cachedFilteredData.isEmpty) {
+      _cachedFilteredData = _filterData();
+      _lastUsedFilter = currentFilter.value;
+    }
+    return _cachedFilteredData;
+  }
+
+  List<LottoDraw> _filterData() {
     if (currentFilter.value == TimeFilter.allTime) return lottoData;
 
     final now = DateTime.now();
@@ -92,29 +107,37 @@ class LottoController extends GetxController {
     }).toList();
   }
 
-  void lottoStatistics() {
+  void refreshStatistics() {
+    final filtered = getFilteredData();
+    frequencyTableOutput = _generateFrequencyTable(filtered);
+    frequencyRankingOutput = _generateFrequencyRanking(filtered);
+    groupRankingOutput = _generateGroupRanking(filtered);
+    sequenceTiersOutput = _generateSequenceTiers(filtered);
+  }
+
+  String _generateFrequencyTable(List<LottoDraw> draws) {
     Map<int, int> numberCounts = {};
 
-    for (var draw in _filteredData()) {
+    for (var draw in draws) {
       for (var number in draw.results) {
         numberCounts[number] = (numberCounts[number] ?? 0) + 1;
       }
     }
 
-    StringBuffer occurrences = StringBuffer();
+    StringBuffer output = StringBuffer();
     for (int i = 1; i <= 60; i++) {
       int count = numberCounts[i] ?? 0;
-      occurrences.write('[$i] appeared $count times');
-      if (i < 60) occurrences.writeln();
+      output.write('[$i] appeared $count times');
+      if (i < 60) output.writeln();
     }
 
-    updateLottoBanner(occurrences.toString());
+    return output.toString();
   }
 
-  void computeFrequencyRanking() {
+  String _generateFrequencyRanking(List<LottoDraw> draws) {
     Map<int, int> numberCounts = {};
 
-    for (var draw in _filteredData()) {
+    for (var draw in draws) {
       for (var number in draw.results) {
         numberCounts[number] = (numberCounts[number] ?? 0) + 1;
       }
@@ -139,13 +162,13 @@ class LottoController extends GetxController {
       if (i < ranked.length - 1) output.writeln();
     }
 
-    updateLottoBanner(output.toString());
+    return output.toString();
   }
 
-  void computeGroupRanking() {
+  String _generateGroupRanking(List<LottoDraw> draws) {
     Map<int, int> numberCounts = {};
 
-    for (var draw in _filteredData()) {
+    for (var draw in draws) {
       for (var number in draw.results) {
         numberCounts[number] = (numberCounts[number] ?? 0) + 1;
       }
@@ -179,9 +202,8 @@ class LottoController extends GetxController {
       }
     });
 
-    final ranked =
-        groupCounts.entries.toList()
-          ..sort((a, b) => b.value.compareTo(a.value));
+    final ranked = groupCounts.entries.toList()
+      ..sort((a, b) => b.value.compareTo(a.value));
 
     final output = StringBuffer();
     for (int i = 0; i < ranked.length; i++) {
@@ -190,10 +212,10 @@ class LottoController extends GetxController {
       if (i < ranked.length - 1) output.writeln();
     }
 
-    updateLottoBanner(output.toString());
+    return output.toString();
   }
 
-  void computeSequenceTiers() {
+  String _generateSequenceTiers(List<LottoDraw> draws) {
     final Map<String, int> tierCounts = {
       't6': 0,
       't5': 0,
@@ -202,7 +224,7 @@ class LottoController extends GetxController {
       't2': 0,
     };
 
-    for (var draw in _filteredData()) {
+    for (var draw in draws) {
       final list = draw.results;
       if (list.length < 2) continue;
 
@@ -234,12 +256,12 @@ class LottoController extends GetxController {
         if (!first) {
           output.write('\n');
         }
-        output.write('$tier: $count');
+        output.write('$tier appeared $count times');
         first = false;
       }
     }
 
-    updateLottoBanner(output.toString());
+    return output.toString();
   }
 
   void loadLottoResults() async {
@@ -248,6 +270,7 @@ class LottoController extends GetxController {
       Map<String, dynamic> jsonMap = jsonDecode(jsonData);
       LottoHistory history = LottoHistory.fromJson(jsonMap);
       lottoData.value = history.draws;
+      refreshStatistics();
       updateView(ViewMode.frequencyTable);
     } catch (e) {
       Get.dialog(
