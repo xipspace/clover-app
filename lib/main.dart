@@ -115,19 +115,10 @@ class InfoScreen extends StatelessWidget {
                 const SizedBox(height: 20),
                 Obx(() => Text(controller.msg.value)),
                 Obx(() => Text(controller.timeStamp.value)),
-                const SizedBox(height: 20),
-                Obx(() => Text('results: ${lottoController.lottoData.length.toString()}')),
-                Obx(() {
-                  if (lottoController.lottoData.isEmpty) {
-                    return const Text('last update: empty');
-                  }
-
-                  final raw = lottoController.lottoData.last.date;
-                  final parts = raw.split('_'); // ['2025', '05', '31']
-                  final formatted = '${parts[2]}-${parts[1]}-${parts[0]}'; // 31-05-2025
-
-                  return Text('last update: $formatted');
-                }),
+                const SizedBox(height: 10),
+                Text('draws: ${lottoController.lottoData.length.toString()}'),
+                Text(lottoController.formattedLastDraw),
+                Text('last result: ${lottoController.lottoData.last.results.toString()}'),
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

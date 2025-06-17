@@ -43,13 +43,22 @@ class LottoController extends GetxController {
   String sequenceTiersOutput = '';
 
   @override
-  void onInit() {
-    super.onInit();
+  void onReady() {
+    super.onReady();
     loadLottoResults();
   }
 
   void updateLottoBanner(String text) {
     lottoBanner.value = text;
+  }
+
+  String get formattedLastDraw {
+    if (lottoData.isEmpty) return 'last draw: void';
+
+    final raw = lottoData.last.date;
+    final parts = raw.split('_'); // ['2025', '05', '31']
+    final formatted = '${parts[2]}-${parts[1]}-${parts[0]}'; // 31-05-2025
+    return 'last draw: $formatted';
   }
 
   void updateView(ViewMode mode) {
