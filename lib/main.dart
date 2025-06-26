@@ -30,7 +30,10 @@ class MainApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         useMaterial3: true,
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.green),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: Colors.green,
+          brightness: Brightness.light,
+        ),
       ),
       initialRoute: '/',
       initialBinding: AppBindings(),
@@ -49,7 +52,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('@xipspace'),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.green.shade300,
         actions: [
           IconButton(icon: const Icon(Icons.dark_mode_outlined), onPressed: () {}),
           IconButton(icon: const Icon(Icons.person_outline), onPressed: () {}),
@@ -98,7 +101,7 @@ class InfoScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(child: const Text('@xipspace'), onTap: () => Get.offAll(() => const HomeScreen())),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.green.shade300,
         actions: [
           IconButton(icon: const Icon(Icons.dark_mode_outlined), onPressed: () {}),
           IconButton(icon: const Icon(Icons.person_outline), onPressed: () => Get.to(() => const UserScreen())),
@@ -232,7 +235,7 @@ class InfoScreen extends StatelessWidget {
                     constraints: const BoxConstraints(maxHeight: 640),
                     child: SingleChildScrollView(
                       child: Padding(
-                        padding: const EdgeInsets.symmetric(vertical: 30.0, horizontal: 10.0),
+                        padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 10.0),
                         child: Center(
                           child: Column(
                             children: [
@@ -260,12 +263,13 @@ class UserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
+    final userController = Get.find<UserController>();
     final MediaQueryData mediaQueryData = MediaQuery.of(context);
 
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(child: const Text('@xipspace'), onTap: () => Get.offAll(() => const HomeScreen())),
-        backgroundColor: Colors.green,
+        backgroundColor: Colors.green.shade300,
         actions: [
           IconButton(icon: const Icon(Icons.dark_mode_outlined), onPressed: () {}),
           IconButton(icon: const Icon(Icons.person_outline), onPressed: () {}),
@@ -298,6 +302,10 @@ class UserScreen extends StatelessWidget {
             // height: Get.height * 0.95,
 
             const SizedBox(height: 20),
+            Obx(() => Text(userController.profile.value.userName)),
+            Obx(() => Text(userController.profile.value.games.toString())),
+            const SizedBox(height: 20),
+            const SizedBox(height: 20),
           ],
         ),
       ),
@@ -307,7 +315,8 @@ class UserScreen extends StatelessWidget {
           controller.setStamp();
           // controller.isLogged.toggle();
           // controller.isLogged.value ? controller.setMsg('user') : controller.setMsg('guest');
-          controller.setMessage('user');
+          // controller.setMessage('user');
+          userController.setName("user");
         },
       ),
     );

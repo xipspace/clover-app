@@ -64,3 +64,49 @@ class LottoHistory {
     return map;
   }
 }
+
+class UserProfile {
+  String userName;
+  List<UserGame> games;
+
+  UserProfile({required this.userName, required this.games});
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      userName: json['userName'],
+      games:
+          (json['games'] as List)
+              .map((gameJson) => UserGame.fromJson(gameJson))
+              .toList(),
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'userName': userName,
+    'games': games.map((g) => g.toJson()).toList(),
+  };
+}
+
+class UserGame {
+  final String name;
+  final List<int> numbers;
+  final String createdAt;
+
+  UserGame({required this.name, required this.numbers, required this.createdAt})
+    : assert(numbers.length <= 60),
+      assert(numbers.toSet().length == numbers.length); // no duplicates
+
+  factory UserGame.fromJson(Map<String, dynamic> json) {
+    return UserGame(
+      name: json['name'],
+      numbers: List<int>.from(json['numbers']),
+      createdAt: json['createdAt'],
+    );
+  }
+
+  Map<String, dynamic> toJson() => {
+    'name': name,
+    'numbers': numbers,
+    'createdAt': createdAt,
+  };
+}

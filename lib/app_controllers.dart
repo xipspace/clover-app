@@ -22,7 +22,6 @@ class HomeController extends GetxController {
     super.onInit();
     setStamp();
   }
-
 }
 
 enum ViewMode { frequencyTable, frequencyRanking, groupRanking, sequenceTiers }
@@ -56,8 +55,8 @@ class LottoController extends GetxController {
     if (lottoData.isEmpty) return 'last draw: void';
 
     final raw = lottoData.last.date;
-    final parts = raw.split('_'); // ['2025', '05', '31']
-    final formatted = '${parts[2]}-${parts[1]}-${parts[0]}'; // 31-05-2025
+    final parts = raw.split('_');
+    final formatted = '${parts[2]}-${parts[1]}-${parts[0]}';
     return 'last draw: $formatted';
   }
 
@@ -81,7 +80,9 @@ class LottoController extends GetxController {
 
   void updateFilter(TimeFilter filter) {
     currentFilter.value = filter;
-    refreshStatistics();
+    _cachedFilteredData = _filterData();
+    _lastUsedFilter = currentFilter.value;
+    _refreshCachedStatistics();
     updateView(currentView.value);
   }
 
@@ -123,12 +124,12 @@ class LottoController extends GetxController {
     }).toList();
   }
 
-  void refreshStatistics() {
+  void _refreshCachedStatistics() {
     final filtered = getFilteredData();
     frequencyTableOutput = _generateFrequencyTable(filtered);
     frequencyRankingOutput = _generateFrequencyRanking(filtered);
     groupRankingOutput = _generateGroupRanking(filtered);
-    sequenceTiersOutput = _generateSequenceTiers(filtered);
+    sequenceTiersOutput = _generateTierOutput(filtered);
   }
 
   String _generateFrequencyTable(List<LottoDraw> draws) {
@@ -231,19 +232,24 @@ class LottoController extends GetxController {
     return output.toString();
   }
 
-  String _generateSequenceTiers(List<LottoDraw> draws) {
-    final Map<String, int> tierCounts = {
-      't6': 0,
-      't5': 0,
-      't4': 0,
-      't3': 0,
-      't2': 0,
-    };
+  String _generateTierOutput(List<LottoDraw> draws) {
+    final highest = _generateHighestTierSummary(draws);
+    final total = _generateTotalTierFrequency(draws);
+    final sequenceStats = _generateSequenceCountSummary(draws);
+
+    final lines = <String>[];
+    if (highest.isNotEmpty) lines.addAll(highest.split('\n'));
+    if (total.isNotEmpty) lines.addAll(total.split('\n'));
+    if (sequenceStats.isNotEmpty) lines.addAll(sequenceStats.split('\n'));
+
+    return lines.join('\n');
+  }
+
+  String _generateHighestTierSummary(List<LottoDraw> draws) {
+    final tierCounts = {'t6': 0, 't5': 0, 't4': 0, 't3': 0, 't2': 0};
 
     for (var draw in draws) {
-      final list = draw.results;
-      if (list.length < 2) continue;
-
+      final list = List<int>.from(draw.results)..sort();
       int maxStreak = 1;
       int currentStreak = 1;
 
@@ -264,20 +270,105 @@ class LottoController extends GetxController {
       }
     }
 
-    final output = StringBuffer();
-    bool first = true;
+    final buffer = StringBuffer();
     for (var tier in ['t6', 't5', 't4', 't3', 't2']) {
-      final count = tierCounts[tier];
-      if (count != null && count > 0) {
-        if (!first) {
-          output.write('\n');
-        }
-        output.write('$tier appeared $count times');
-        first = false;
+      final count = tierCounts[tier]!;
+      if (count > 0) {
+        buffer.write('$tier is highest in $count draws');
+        buffer.writeln();
       }
     }
 
-    return output.toString();
+    return buffer.toString().trimRight();
+  }
+
+  String _generateTotalTierFrequency(List<LottoDraw> draws) {
+    final tierTotals = {'t6': 0, 't5': 0, 't4': 0, 't3': 0, 't2': 0};
+
+    for (var draw in draws) {
+      final list = List<int>.from(draw.results)..sort();
+      int start = 0;
+
+      while (start < list.length) {
+        int end = start;
+        while (end + 1 < list.length && list[end + 1] == list[end] + 1) {
+          end++;
+        }
+
+        int streakLength = end - start + 1;
+
+        while (streakLength >= 6) {
+          tierTotals['t6'] = tierTotals['t6']! + 1;
+          streakLength -= 6;
+        }
+        if (streakLength >= 5) {
+          tierTotals['t5'] = tierTotals['t5']! + 1;
+          streakLength -= 5;
+        }
+        if (streakLength >= 4) {
+          tierTotals['t4'] = tierTotals['t4']! + 1;
+          streakLength -= 4;
+        }
+        if (streakLength >= 3) {
+          tierTotals['t3'] = tierTotals['t3']! + 1;
+          streakLength -= 3;
+        }
+        if (streakLength == 2) {
+          tierTotals['t2'] = tierTotals['t2']! + 1;
+        }
+
+        start = end + 1;
+      }
+    }
+
+    final buffer = StringBuffer();
+    for (var tier in ['t6', 't5', 't4', 't3', 't2']) {
+      final count = tierTotals[tier]!;
+      if (count > 0) {
+        buffer.write('$tier occurred $count times');
+        buffer.writeln();
+      }
+    }
+
+    return buffer.toString().trimRight();
+  }
+
+  String _generateSequenceCountSummary(List<LottoDraw> draws) {
+    int single = 0;
+    int multiple = 0;
+
+    for (var draw in draws) {
+      final list = List<int>.from(draw.results)..sort();
+      int start = 0;
+      int streaks = 0;
+
+      while (start < list.length) {
+        int end = start;
+        while (end + 1 < list.length && list[end + 1] == list[end] + 1) {
+          end++;
+        }
+
+        int streakLength = end - start + 1;
+        if (streakLength >= 2) {
+          streaks++;
+        }
+
+        start = end + 1;
+      }
+
+      if (streaks == 1) {
+        single++;
+      } else if (streaks > 1) {
+        multiple++;
+      }
+    }
+
+    final buffer = StringBuffer();
+    buffer.write('single tier in a single draw $single');
+    buffer.writeln();
+    buffer.write('multiple tiers in single draw $multiple');
+
+    return buffer.toString().trimRight();
   }
 
   void loadLottoResults() async {
@@ -286,7 +377,7 @@ class LottoController extends GetxController {
       Map<String, dynamic> jsonMap = jsonDecode(jsonData);
       LottoHistory history = LottoHistory.fromJson(jsonMap);
       lottoData.value = history.draws;
-      refreshStatistics();
+      _refreshCachedStatistics();
       updateView(ViewMode.frequencyTable);
     } catch (e) {
       Get.dialog(
@@ -307,10 +398,25 @@ class LottoController extends GetxController {
   }
 }
 
+
+class UserController extends GetxController {
+  // add user object to factory game with combinations of numbers to be compared with lotto data
+  final Rx<UserProfile> profile = UserProfile(userName: 'guest', games: []).obs;
+
+  void setName(String text) {
+    profile.update((p) {
+      if (p != null) {
+        p.userName = text;
+      }
+    });
+  }
+}
+
 class AppBindings implements Bindings {
   @override
   void dependencies() {
     Get.put(HomeController());
     Get.put(LottoController());
+    Get.put(UserController());
   }
 }
