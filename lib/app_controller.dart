@@ -3,7 +3,7 @@ import 'package:get/get.dart';
 import 'dart:convert';
 import 'package:flutter/services.dart';
 
-import 'app_models.dart';
+import 'app_model.dart';
 
 class HomeController extends GetxController {
   RxString msg = 'welcome'.obs;

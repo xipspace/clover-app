@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-import 'app_controllers.dart';
+import 'app_controller.dart';
 
 enum AppScreen { home, info, user }
 
