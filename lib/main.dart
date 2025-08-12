@@ -52,7 +52,7 @@ class HomeScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: const Text('@xipspace'),
-        backgroundColor: Colors.green.shade300,
+        backgroundColor: Colors.green,
         actions: [
           IconButton(icon: const Icon(Icons.dark_mode_outlined), onPressed: () {}),
           IconButton(icon: const Icon(Icons.person_outline), onPressed: () {}),
@@ -101,7 +101,7 @@ class InfoScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(child: const Text('@xipspace'), onTap: () => Get.offAll(() => const HomeScreen())),
-        backgroundColor: Colors.green.shade300,
+        backgroundColor: Colors.green,
         actions: [
           IconButton(icon: const Icon(Icons.dark_mode_outlined), onPressed: () {}),
           IconButton(icon: const Icon(Icons.person_outline), onPressed: () => Get.to(() => const UserScreen())),
@@ -145,7 +145,10 @@ class InfoScreen extends StatelessWidget {
                             icon: const Icon(Icons.arrow_drop_down),
                             dropdownColor: Colors.green.shade50,
                             borderRadius: BorderRadius.circular(12),
-                            style: const TextStyle(fontSize: 14),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
                             items: const [
                               DropdownMenuItem(
                                 value: TimeFilter.allTime,
@@ -198,7 +201,10 @@ class InfoScreen extends StatelessWidget {
                             icon: const Icon(Icons.arrow_drop_down),
                             dropdownColor: Colors.green.shade50,
                             borderRadius: BorderRadius.circular(12),
-                            style: const TextStyle(fontSize: 14),
+                            style: const TextStyle(
+                              fontSize: 14,
+                              color: Colors.black,
+                            ),
                             items: const [
                               DropdownMenuItem(
                                 value: ViewMode.frequencyTable,
@@ -269,7 +275,7 @@ class UserScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         title: GestureDetector(child: const Text('@xipspace'), onTap: () => Get.offAll(() => const HomeScreen())),
-        backgroundColor: Colors.green.shade300,
+        backgroundColor: Colors.green,
         actions: [
           IconButton(icon: const Icon(Icons.dark_mode_outlined), onPressed: () {}),
           IconButton(icon: const Icon(Icons.person_outline), onPressed: () {}),
