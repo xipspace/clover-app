@@ -207,6 +207,10 @@ class InfoScreen extends StatelessWidget {
                             ),
                             items: const [
                               DropdownMenuItem(
+                                value: ViewMode.drawResults,
+                                child: Text('Draw Results'),
+                              ),
+                              DropdownMenuItem(
                                 value: ViewMode.frequencyTable,
                                 child: Text('Frequency by Number'),
                               ),
@@ -274,7 +278,7 @@ class UserScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: GestureDetector(child: const Text('@xipspace'), onTap: () => Get.offAll(() => const HomeScreen())),
+        // title: GestureDetector(child: const Text('@xipspace'), onTap: () => Get.offAll(() => const HomeScreen())),
         backgroundColor: Colors.green,
         actions: [
           IconButton(icon: const Icon(Icons.dark_mode_outlined), onPressed: () {}),
@@ -311,6 +315,13 @@ class UserScreen extends StatelessWidget {
             Obx(() => Text(userController.profile.value.userName)),
             Obx(() => Text(userController.profile.value.games.toString())),
             const SizedBox(height: 20),
+
+
+            // TODO > show dynamic list with user games
+            // TODO > compare with previous results
+            // TODO > show hit ratio list best results and their dates
+
+            
             const SizedBox(height: 20),
           ],
         ),
@@ -321,8 +332,13 @@ class UserScreen extends StatelessWidget {
           controller.setStamp();
           // controller.isLogged.toggle();
           // controller.isLogged.value ? controller.setMsg('user') : controller.setMsg('guest');
+          userController.setName('user');
           // controller.setMessage('user');
-          userController.setName("user");
+
+          // TODO > add user game object
+          // TODO > persist user games
+
+
         },
       ),
     );

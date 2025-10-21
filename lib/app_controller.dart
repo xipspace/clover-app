@@ -24,10 +24,8 @@ class HomeController extends GetxController {
   }
 }
 
-enum ViewMode { frequencyTable, frequencyRanking, groupRanking, sequenceTiers }
+enum ViewMode { drawResults, frequencyTable, frequencyRanking, groupRanking, sequenceTiers }
 enum TimeFilter { allTime, oneMonth, sixMonths, oneYear, fiveYears }
-
-// controller
 
 class LottoController extends GetxController {
   RxString lottoBanner = 'void'.obs;
@@ -38,6 +36,7 @@ class LottoController extends GetxController {
   List<LottoDraw> _cachedFilteredData = [];
   TimeFilter? _lastUsedFilter;
 
+  String drawResultsOutput = '';
   String frequencyTableOutput = '';
   String frequencyRankingOutput = '';
   String groupRankingOutput = '';
@@ -111,6 +110,9 @@ class LottoController extends GetxController {
   void updateView(ViewMode mode) {
     currentView.value = mode;
     switch (mode) {
+      case ViewMode.drawResults:
+        lottoBanner.value = drawResultsOutput;
+        break;
       case ViewMode.frequencyTable:
         lottoBanner.value = frequencyTableOutput;
         break;
@@ -172,10 +174,32 @@ class LottoController extends GetxController {
 
   void refreshStatistics() {
     final filtered = getFilteredData();
+
+    // generate all outputs once
+    drawResultsOutput = _generateDrawResults(filtered);
     frequencyTableOutput = _generateFrequencyTable(filtered);
     frequencyRankingOutput = _generateFrequencyRanking(filtered);
     groupRankingOutput = _generateGroupRanking(filtered);
     sequenceTiersOutput = _generateTierOutput(filtered);
+  }
+
+  // TODO > refine logic to properly handle results object
+  String _generateDrawResults(List<LottoDraw> draws) {
+    if (draws.isEmpty) return 'no draw results available';
+
+    // sort descending by drawNumber
+    final sorted = List<LottoDraw>.from(draws)..sort((a, b) => int.parse(b.drawNumber).compareTo(int.parse(a.drawNumber)));
+
+    final buffer = StringBuffer();
+
+    for (final draw in sorted) {
+      final formattedDate = _formatDate(draw.date);
+      final numbers = draw.results.map((n) => n.toString().padLeft(2, '0')).join(', ');
+
+      buffer.writeln('[$formattedDate] draw ${draw.drawNumber}: [$numbers]');
+    }
+
+    return buffer.toString().trim();
   }
 
   String _generateTierOutput(List<LottoDraw> draws) {

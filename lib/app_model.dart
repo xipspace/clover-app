@@ -22,25 +22,19 @@ class LottoNumber {
 }
 
 class LottoDraw {
+  final String drawNumber;
   final String date;
   final List<int> results;
 
-  LottoDraw({required this.date, required this.results});
+  LottoDraw({required this.drawNumber, required this.date, required this.results});
 
-  factory LottoDraw.fromJson(Map<String, dynamic> json) {
-    List<dynamic> resultsJson = json['result'] ?? [];
-    var sortedResults = List<int>.from(resultsJson);
-    sortedResults.sort();
-    return LottoDraw(
-      date: json['date'],
-      results: sortedResults,
-    );
+  factory LottoDraw.fromJson(String drawNumber, Map<String, dynamic> json) {
+    return LottoDraw(drawNumber: drawNumber, date: json['date'], results: List<int>.from(json['result']));
   }
 
-  Map<String, dynamic> toJson() => {
-        'date': date,
-        'result': results,
-      };
+  Map<String, dynamic> toJson() {
+    return {'date': date, 'result': results};
+  }
 }
 
 class LottoHistory {
@@ -51,7 +45,7 @@ class LottoHistory {
   factory LottoHistory.fromJson(Map<String, dynamic> json) {
     List<LottoDraw> draws = [];
     json.forEach((key, value) {
-      draws.add(LottoDraw.fromJson(value));
+      draws.add(LottoDraw.fromJson(key, value));
     });
     return LottoHistory(draws: draws);
   }
