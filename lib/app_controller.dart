@@ -30,7 +30,7 @@ enum TimeFilter { allTime, oneMonth, sixMonths, oneYear, fiveYears }
 class LottoController extends GetxController {
   RxString lottoBanner = 'void'.obs;
   RxList<LottoDraw> lottoData = <LottoDraw>[].obs;
-  var currentView = ViewMode.frequencyTable.obs;
+  var currentView = ViewMode.drawResults.obs;
   var currentFilter = TimeFilter.allTime.obs;
 
   List<LottoDraw> _cachedFilteredData = [];
@@ -183,7 +183,6 @@ class LottoController extends GetxController {
     sequenceTiersOutput = _generateTierOutput(filtered);
   }
 
-  // TODO > refine logic to properly handle results object
   String _generateDrawResults(List<LottoDraw> draws) {
     if (draws.isEmpty) return 'no draw results available';
 
@@ -427,7 +426,7 @@ class LottoController extends GetxController {
       LottoHistory history = LottoHistory.fromJson(jsonMap);
       lottoData.value = history.draws;
       refreshStatistics();
-      updateView(ViewMode.frequencyTable);
+      updateView(ViewMode.drawResults);
     } catch (e) {
       Get.dialog(
         AlertDialog(
@@ -448,9 +447,32 @@ class LottoController extends GetxController {
 
 
 class UserController extends GetxController {
-  // add user object to factory game with combinations of numbers to be compared with lotto data
+  // TODO > add user object to factory game with combinations of numbers to be compared with lotto data
   final Rx<UserProfile> profile = UserProfile(userName: 'guest', games: []).obs;
 
+  // TODO > get dialog to provide pattern input
+  void showDialog(String title, String content) {
+    Get.dialog(
+      AlertDialog(
+        title: Text(title),
+        content: Text(content),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Column(children: [SizedBox(width: 50), Text('cancel')]),
+          ),
+          TextButton(
+            onPressed: () {
+              // TODO > add user game with selection//
+              Get.back();
+            },
+            child: const Column(children: [SizedBox(width: 50), Text('OK')]),
+          ),
+        ],
+      ),
+    );
+  }
+  
   void setName(String text) {
     profile.update((p) {
       if (p != null) {
@@ -458,6 +480,8 @@ class UserController extends GetxController {
       }
     });
   }
+
+  // TODO > logic to create game object
 }
 
 class AppBindings implements Bindings {

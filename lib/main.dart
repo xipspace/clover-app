@@ -273,7 +273,7 @@ class UserScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
-    final userController = Get.find<UserController>();
+    final user = Get.find<UserController>();
     final MediaQueryData mediaQueryData = MediaQuery.of(context);
 
     return Scaffold(
@@ -312,8 +312,8 @@ class UserScreen extends StatelessWidget {
             // height: Get.height * 0.95,
 
             const SizedBox(height: 20),
-            Obx(() => Text(userController.profile.value.userName)),
-            Obx(() => Text(userController.profile.value.games.toString())),
+            Obx(() => Text(user.profile.value.userName)),
+            Obx(() => Text(user.profile.value.games.toString())),
             const SizedBox(height: 20),
 
 
@@ -332,12 +332,11 @@ class UserScreen extends StatelessWidget {
           controller.setStamp();
           // controller.isLogged.toggle();
           // controller.isLogged.value ? controller.setMsg('user') : controller.setMsg('guest');
-          userController.setName('user');
           // controller.setMessage('user');
-
-          // TODO > add user game object
+          //// userController.setName('user');
+          
           // TODO > persist user games
-
+          user.showDialog('title', 'content');
 
         },
       ),
