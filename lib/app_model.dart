@@ -83,20 +83,20 @@ class UserProfile {
 
 class UserGame {
   final String name;
-  final int size;
+  final int lenght;
   final List<int> numbers;
   final String createdAt;
 
-  UserGame({required this.name, required this.size, required this.numbers, required this.createdAt})
-    : assert(size >= 6 && size <= 20, 'size must be between 6 and 20'),
-      assert(numbers.length == size, 'numbers length must match size ($size)'),
+  UserGame({required this.name, required this.lenght, required this.numbers, required this.createdAt})
+    : assert(lenght >= 6 && lenght <= 20, 'size must be between 6 and 20'),
+      assert(numbers.length == lenght, 'numbers length must match size ($lenght)'),
       assert(numbers.toSet().length == numbers.length, 'numbers must not contain duplicates'),
       assert(numbers.every((n) => n >= 1 && n <= 60), 'numbers must be between 1 and 60 inclusive');
 
   factory UserGame.fromJson(Map<String, dynamic> json) {
-    return UserGame(name: json['name'], size: json['size'], numbers: List<int>.from(json['numbers']), createdAt: json['createdAt']);
+    return UserGame(name: json['name'], lenght: json['size'], numbers: List<int>.from(json['numbers']), createdAt: json['createdAt']);
   }
 
-  Map<String, dynamic> toJson() => {'name': name, 'size': size, 'numbers': numbers, 'createdAt': createdAt};
+  Map<String, dynamic> toJson() => {'name': name, 'size': lenght, 'numbers': numbers, 'createdAt': createdAt};
 }
 

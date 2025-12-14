@@ -463,7 +463,7 @@ class UserController extends GetxController {
           ),
           TextButton(
             onPressed: () {
-              // TODO > add user game with selection//
+              // TODO > add user game with selection
               Get.back();
             },
             child: const Column(children: [SizedBox(width: 50), Text('OK')]),
@@ -478,6 +478,16 @@ class UserController extends GetxController {
       if (p != null) {
         p.userName = text;
       }
+    });
+  }
+
+  void addDummyGame() {
+    final dummy = UserGame(name: 'Test Game', lenght: 6, numbers: const [1, 2, 3, 4, 5, 6], createdAt: DateTime.now().toIso8601String());
+
+    profile.update((p) {
+      if (p == null) return;
+      p.userName = 'dummy';
+      p.games.add(dummy);
     });
   }
 
