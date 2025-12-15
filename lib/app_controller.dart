@@ -447,9 +447,10 @@ class LottoController extends GetxController {
 
 
 class UserController extends GetxController {
-  // TODO > add user object to factory game with combinations of numbers to be compared with lotto data
+  // add user object to factory game with combinations of numbers to be compared with lotto data
   final Rx<UserProfile> profile = UserProfile(userName: 'guest', games: []).obs;
 
+  // update user name
   void setName(String text) {
     profile.update((p) {
       if (p != null) {
@@ -458,6 +459,7 @@ class UserController extends GetxController {
     });
   }
 
+  // create a game object
   void addGame(UserGame userGame) {
     profile.update((p) {
       if (p == null) return;
@@ -465,11 +467,12 @@ class UserController extends GetxController {
     });
   }
 
-  // TODO > get dialog to provide pattern input
+  // get dialog to provide pattern input
   void addGameDialog() {
     Get.dialog(
       AlertDialog(
-        title: Text('title'),
+        title: Text('add new game'),
+        // TODO > toggle number list and length selector
         content: Text('content'),
         actions: [
           TextButton(
@@ -478,7 +481,9 @@ class UserController extends GetxController {
           ),
           TextButton(
             onPressed: () {
-              // TODO > add user game with selection
+              // add user game with selection
+              final userGame = UserGame(name: 'Test Game', lenght: 6, numbers: const [1, 2, 3, 4, 5, 6], createdAt: DateTime.now().toIso8601String());
+              addGame(userGame);
               Get.back();
             },
             child: const Column(children: [SizedBox(width: 50), Text('OK')]),
@@ -501,7 +506,6 @@ class UserController extends GetxController {
           ),
           TextButton(
             onPressed: () {
-              // TODO > add user game with selection
               Get.back();
             },
             child: const Column(children: [SizedBox(width: 50), Text('OK')]),
@@ -512,9 +516,6 @@ class UserController extends GetxController {
   }
   */
   
-  
-
-  // TODO > logic to create game object
 }
 
 class AppBindings implements Bindings {

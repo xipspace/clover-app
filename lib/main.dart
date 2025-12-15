@@ -495,8 +495,7 @@ class UserScreen extends StatelessWidget {
           // controller.setMessage('user');
 
           // TODO > persist user games
-          final userGame = UserGame(name: 'Test Game', lenght: 6, numbers: const [1, 2, 3, 4, 5, 6], createdAt: DateTime.now().toIso8601String());
-          user.addGame(userGame);
+          user.addGameDialog();
         },
       ),
     );
