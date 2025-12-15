@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'app_controller.dart';
-import 'app_model.dart';
+// import 'app_model.dart';
 
 enum AppScreen { home, info, user }
 
@@ -275,7 +275,7 @@ class UserScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
     final user = Get.find<UserController>();
-    final lotto = Get.find<LottoController>();
+    // final lotto = Get.find<LottoController>();
     final MediaQueryData mediaQueryData = MediaQuery.of(context);
 
     return Scaffold(
@@ -327,6 +327,7 @@ class UserScreen extends StatelessWidget {
                         games.map((game) {
                           return Card(
                             child: Container(
+                              decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(12)),
                               constraints: const BoxConstraints(maxWidth: 680.0),
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 30.0),
@@ -349,7 +350,7 @@ class UserScreen extends StatelessWidget {
                                     ),
                                     Divider(),
                                     const SizedBox(height: 10),
-                                    Text('size: ${game.lenght}'),
+                                    Text('size: ${game.length}'),
                                     Text('numbers: ${game.numbers.join(', ')}'),
                                     Text('created: ${game.createdAt}'),
                                     Text('statistics: [tbd]'),

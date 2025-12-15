@@ -490,7 +490,7 @@ class UserController extends GetxController {
           TextButton(
             onPressed: () {
               // add user game with selection
-              final userGame = UserGame(name: 'Test Game', lenght: 6, numbers: const [1, 2, 3, 4, 5, 6], createdAt: DateTime.now());
+              final userGame = UserGame(name: 'Test Game', length: 6, numbers: const [1, 2, 3, 4, 5, 6], createdAt: DateTime.now());
               addGame(userGame);
               Get.back();
             },
