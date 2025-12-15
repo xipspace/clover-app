@@ -450,7 +450,7 @@ class UserController extends GetxController {
   // add user object to factory game with combinations of numbers to be compared with lotto data
   final Rx<UserProfile> profile = UserProfile(userName: 'guest', games: []).obs;
 
-  // update user name
+  // update user name from profile
   void setName(String text) {
     profile.update((p) {
       if (p != null) {
@@ -459,11 +459,19 @@ class UserController extends GetxController {
     });
   }
 
-  // create a game object
+  // create a game object on profile
   void addGame(UserGame userGame) {
     profile.update((p) {
       if (p == null) return;
       p.games.add(userGame);
+    });
+  }
+
+  // delete a game object on profile
+  void deleteGame(UserGame game) {
+    profile.update((p) {
+      if (p == null) return;
+      p.games.remove(game);
     });
   }
 
@@ -492,29 +500,6 @@ class UserController extends GetxController {
       ),
     );
   }
-
-  /*
-  void showDialog(String title, String content) {
-    Get.dialog(
-      AlertDialog(
-        title: Text(title),
-        content: Text(content),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Column(children: [SizedBox(width: 50), Text('cancel')]),
-          ),
-          TextButton(
-            onPressed: () {
-              Get.back();
-            },
-            child: const Column(children: [SizedBox(width: 50), Text('OK')]),
-          ),
-        ],
-      ),
-    );
-  }
-  */
   
 }
 
