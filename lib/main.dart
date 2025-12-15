@@ -104,8 +104,8 @@ class InfoScreen extends StatelessWidget {
         title: GestureDetector(child: const Text('@xipspace'), onTap: () => Get.offAll(() => const HomeScreen())),
         backgroundColor: Colors.green,
         actions: [
-          IconButton(icon: const Icon(Icons.dark_mode_outlined), onPressed: () {}),
           IconButton(icon: const Icon(Icons.person_outline), onPressed: () => Get.to(() => const UserScreen())),
+          IconButton(icon: const Icon(Icons.dark_mode_outlined), onPressed: () {}),
           IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
           const SizedBox(width: 10),
         ],
@@ -283,8 +283,8 @@ class UserScreen extends StatelessWidget {
         // title: GestureDetector(child: const Text('@xipspace'), onTap: () => Get.offAll(() => const HomeScreen())),
         backgroundColor: Colors.green,
         actions: [
-          IconButton(icon: const Icon(Icons.dark_mode_outlined), onPressed: () {}),
           IconButton(icon: const Icon(Icons.person_outline), onPressed: () {}),
+          IconButton(icon: const Icon(Icons.dark_mode_outlined), onPressed: () {}),
           IconButton(icon: const Icon(Icons.more_vert), onPressed: () {}),
           const SizedBox(width: 10),
         ],

@@ -472,7 +472,7 @@ class UserController extends GetxController {
     Get.dialog(
       AlertDialog(
         title: Text('add new game'),
-        // TODO > toggle number list and length selector
+        // TODO > title, toggle number list and length selector
         content: Text('content'),
         actions: [
           TextButton(
@@ -482,7 +482,7 @@ class UserController extends GetxController {
           TextButton(
             onPressed: () {
               // add user game with selection
-              final userGame = UserGame(name: 'Test Game', lenght: 6, numbers: const [1, 2, 3, 4, 5, 6], createdAt: DateTime.now().toIso8601String());
+              final userGame = UserGame(name: 'Test Game', lenght: 6, numbers: const [1, 2, 3, 4, 5, 6], createdAt: DateTime.now());
               addGame(userGame);
               Get.back();
             },

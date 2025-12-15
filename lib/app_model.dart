@@ -85,7 +85,7 @@ class UserGame {
   final String name;
   final int lenght;
   final List<int> numbers;
-  final String createdAt;
+  final DateTime createdAt;
 
   UserGame({required this.name, required this.lenght, required this.numbers, required this.createdAt})
     : assert(lenght >= 6 && lenght <= 20, 'size must be between 6 and 20'),
@@ -94,9 +94,9 @@ class UserGame {
       assert(numbers.every((n) => n >= 1 && n <= 60), 'numbers must be between 1 and 60 inclusive');
 
   factory UserGame.fromJson(Map<String, dynamic> json) {
-    return UserGame(name: json['name'], lenght: json['size'], numbers: List<int>.from(json['numbers']), createdAt: json['createdAt']);
+    return UserGame(name: json['name'], lenght: json['size'], numbers: List<int>.from(json['numbers']), createdAt: DateTime.parse(json['createdAt']));
   }
 
-  Map<String, dynamic> toJson() => {'name': name, 'size': lenght, 'numbers': numbers, 'createdAt': createdAt};
+  Map<String, dynamic> toJson() => {'name': name, 'size': lenght, 'numbers': numbers, 'createdAt': createdAt.toIso8601String()};
 }
 
