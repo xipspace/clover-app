@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
 import 'app_controller.dart';
+import 'app_model.dart';
 
 enum AppScreen { home, info, user }
 
@@ -92,7 +93,7 @@ class InfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
-    final lottoController = Get.find<LottoController>();
+    final lotto = Get.find<LottoController>();
     controller.setStamp();
     if (controller.msg.value != 'user') {
       controller.setMessage('lotto');
@@ -119,16 +120,16 @@ class InfoScreen extends StatelessWidget {
                 Obx(() => Text(controller.msg.value)),
                 Obx(() => Text(controller.timeStamp.value)),
                 const SizedBox(height: 10),
-                Text('draws: ${lottoController.lottoData.length.toString()}'),
-                Text(lottoController.formattedLastDraw),
-                Text('last result: ${lottoController.lottoData.last.results.toString()}'),
+                Text('draws: ${lotto.lottoData.length.toString()}'),
+                Text(lotto.formattedLastDraw),
+                Text('last result: ${lotto.lottoData.last.results.toString()}'),
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     const SizedBox(width: 10),
                     Obx(() {
-                      final current = lottoController.currentFilter.value;
+                      final current = lotto.currentFilter.value;
 
                       return DropdownButtonHideUnderline(
                         child: Container(
@@ -173,7 +174,7 @@ class InfoScreen extends StatelessWidget {
                             ],
                             onChanged: (value) {
                               if (value != null) {
-                                lottoController.updateFilter(value);
+                                lotto.updateFilter(value);
                               }
                             },
                           ),
@@ -184,7 +185,7 @@ class InfoScreen extends StatelessWidget {
                     const SizedBox(width: 10),
 
                     Obx(() {
-                      final current = lottoController.currentView.value;
+                      final current = lotto.currentView.value;
 
                       return DropdownButtonHideUnderline(
                         child: Container(
@@ -229,7 +230,7 @@ class InfoScreen extends StatelessWidget {
                             ],
                             onChanged: (value) {
                               if (value != null) {
-                                lottoController.updateView(value);
+                                lotto.updateView(value);
                               }
                             },
                           ),
@@ -249,7 +250,7 @@ class InfoScreen extends StatelessWidget {
                         child: Center(
                           child: Column(
                             children: [
-                              Obx(() => Text(lottoController.lottoBanner.value, textAlign: TextAlign.center)),
+                              Obx(() => Text(lotto.lottoBanner.value, textAlign: TextAlign.center)),
                             ],
                           ),
                         ),
@@ -465,10 +466,11 @@ class UserScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    Text(game.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                    Text(game.name),
                                     Divider(),
                                     Text('size: ${game.lenght}'),
                                     Text('numbers: ${game.numbers.join(', ')}'),
+                                    Text('created: ${game.createdAt}'),
                                     Text('statistics: [tbd]'),
                                   ],
                                 ),
@@ -491,11 +493,10 @@ class UserScreen extends StatelessWidget {
           // controller.isLogged.toggle();
           // controller.isLogged.value ? controller.setMsg('user') : controller.setMsg('guest');
           // controller.setMessage('user');
-          //// userController.setName('user');
 
           // TODO > persist user games
-          // user.showDialog('title', 'content');
-          user.addDummyGame();
+          final userGame = UserGame(name: 'Test Game', lenght: 6, numbers: const [1, 2, 3, 4, 5, 6], createdAt: DateTime.now().toIso8601String());
+          user.addGame(userGame);
         },
       ),
     );

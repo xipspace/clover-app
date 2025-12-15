@@ -450,7 +450,45 @@ class UserController extends GetxController {
   // TODO > add user object to factory game with combinations of numbers to be compared with lotto data
   final Rx<UserProfile> profile = UserProfile(userName: 'guest', games: []).obs;
 
+  void setName(String text) {
+    profile.update((p) {
+      if (p != null) {
+        p.userName = text;
+      }
+    });
+  }
+
+  void addGame(UserGame userGame) {
+    profile.update((p) {
+      if (p == null) return;
+      p.games.add(userGame);
+    });
+  }
+
   // TODO > get dialog to provide pattern input
+  void addGameDialog() {
+    Get.dialog(
+      AlertDialog(
+        title: Text('title'),
+        content: Text('content'),
+        actions: [
+          TextButton(
+            onPressed: () => Get.back(),
+            child: const Column(children: [SizedBox(width: 50), Text('cancel')]),
+          ),
+          TextButton(
+            onPressed: () {
+              // TODO > add user game with selection
+              Get.back();
+            },
+            child: const Column(children: [SizedBox(width: 50), Text('OK')]),
+          ),
+        ],
+      ),
+    );
+  }
+
+  /*
   void showDialog(String title, String content) {
     Get.dialog(
       AlertDialog(
@@ -472,24 +510,9 @@ class UserController extends GetxController {
       ),
     );
   }
+  */
   
-  void setName(String text) {
-    profile.update((p) {
-      if (p != null) {
-        p.userName = text;
-      }
-    });
-  }
-
-  void addDummyGame() {
-    final dummy = UserGame(name: 'Test Game', lenght: 6, numbers: const [1, 2, 3, 4, 5, 6], createdAt: DateTime.now().toIso8601String());
-
-    profile.update((p) {
-      if (p == null) return;
-      p.userName = 'dummy';
-      p.games.add(dummy);
-    });
-  }
+  
 
   // TODO > logic to create game object
 }
