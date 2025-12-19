@@ -24,9 +24,12 @@ class HomeController extends GetxController {
   }
 }
 
-enum ViewMode { drawResults, frequencyTable, frequencyRanking, groupRanking, sequenceTiers }
+
+
+enum ViewMode { drawResults, frequencyTable, frequencyRanking, groupRanking, sequenceTiers, repeatedDraws }
 enum TimeFilter { allTime, oneMonth, sixMonths, oneYear, fiveYears }
 
+// TODO > add helper to iterate for same draws (and their number/date)
 class LottoController extends GetxController {
   RxString lottoBanner = 'void'.obs;
   RxList<LottoDraw> lottoData = <LottoDraw>[].obs;
@@ -41,6 +44,7 @@ class LottoController extends GetxController {
   String frequencyRankingOutput = '';
   String groupRankingOutput = '';
   String sequenceTiersOutput = '';
+  String repeatedDrawsOutput = '';
 
   @override
   void onReady() {
@@ -125,6 +129,9 @@ class LottoController extends GetxController {
       case ViewMode.sequenceTiers:
         lottoBanner.value = sequenceTiersOutput;
         break;
+      case ViewMode.repeatedDraws:
+        lottoBanner.value = repeatedDrawsOutput;
+        break;
     }
   }
 
@@ -181,6 +188,7 @@ class LottoController extends GetxController {
     frequencyRankingOutput = _generateFrequencyRanking(filtered);
     groupRankingOutput = _generateGroupRanking(filtered);
     sequenceTiersOutput = _generateTierOutput(filtered);
+    repeatedDrawsOutput = _generateRepeatedDraws(filtered);
   }
 
   String _generateDrawResults(List<LottoDraw> draws) {
@@ -333,6 +341,39 @@ class LottoController extends GetxController {
     return buffer.toString();
   }
 
+  String _generateRepeatedDraws(List<LottoDraw> draws) {
+    if (draws.isEmpty) return 'no draw data available';
+
+    final Map<String, List<LottoDraw>> groups = {};
+
+    for (final draw in draws) {
+      final key = (List<int>.from(draw.results)..sort()).join(',');
+      groups.putIfAbsent(key, () => []).add(draw);
+    }
+
+    final repeated = groups.values.where((g) => g.length > 1).toList();
+
+    if (repeated.isEmpty) {
+      return 'no repeated draw results found';
+    }
+
+    final buffer = StringBuffer();
+
+    for (final group in repeated) {
+      final numbers = group.first.results.map((n) => n.toString().padLeft(2, '0')).join(', ');
+
+      buffer.writeln('numbers: [$numbers]');
+
+      for (final draw in group) {
+        buffer.writeln('  - draw ${draw.drawNumber} (${_formatDate(draw.date)})');
+      }
+
+      buffer.writeln(); // group separator
+    }
+
+    return buffer.toString().trim();
+  }
+
   String _generateGroupRanking(List<LottoDraw> draws) {
     final Map<int, int> numberCounts = {};
 
@@ -445,7 +486,7 @@ class LottoController extends GetxController {
 }
 
 
-
+// TODO > extend helper that iterate for same draws (and their number/date) with user selection
 class UserController extends GetxController {
   // add user object to factory game with combinations of numbers to be compared with lotto data
   final Rx<UserProfile> profile = UserProfile(userName: 'guest', games: []).obs;

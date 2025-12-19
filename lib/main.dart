@@ -227,6 +227,10 @@ class InfoScreen extends StatelessWidget {
                                 value: ViewMode.sequenceTiers,
                                 child: Text('Sequence Tiers'),
                               ),
+                              DropdownMenuItem(
+                                value: ViewMode.repeatedDraws,
+                                child: Text('Repeated Draws'),
+                              ),
                             ],
                             onChanged: (value) {
                               if (value != null) {
@@ -302,9 +306,9 @@ class UserScreen extends StatelessWidget {
 
                 // Obx(() => Text('isLogged: ${controller.isLogged}')),
                 // Obx(() => Text(controller.userIsLogged.value.toString())),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 const Text('device info'),
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
                 Text('Screen Size: ${mediaQueryData.size.width} x ${mediaQueryData.size.height}'),
                 Text('Orientation: ${mediaQueryData.orientation}'),
                 Text('Device Pixel Ratio: ${mediaQueryData.devicePixelRatio}'),
@@ -315,8 +319,10 @@ class UserScreen extends StatelessWidget {
                 // Obx(() => Text('isLight: ${controller.isLight}')),
                 // width: Get.width * 0.95,
                 // height: Get.height * 0.95,
-                const SizedBox(height: 20),
                 // Obx(() => Text('username: ${user.profile.value.userName.toString()}')),
+                const SizedBox(height: 20),
+                Obx(() => Text('username: ${user.profile.value.userName}')),
+                Obx(() => Text('games: ${user.profile.value.games.length.toString()}')),
                 const SizedBox(height: 20),
               
                 Obx(() {
@@ -330,7 +336,7 @@ class UserScreen extends StatelessWidget {
                               decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(12)),
                               constraints: const BoxConstraints(maxWidth: 680.0),
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 30.0),
+                                padding: const EdgeInsets.symmetric(vertical: 15.0, horizontal: 30.0),
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
@@ -349,11 +355,12 @@ class UserScreen extends StatelessWidget {
                                       ],
                                     ),
                                     Divider(),
-                                    const SizedBox(height: 10),
+                                    const SizedBox(height: 5),
                                     Text('size: ${game.length}'),
                                     Text('numbers: ${game.numbers.join(', ')}'),
-                                    Text('created: ${game.createdAt}'),
+                                    Text('created: ${game.createdAt.toIso8601String()}'),
                                     Text('statistics: [tbd]'),
+                                    const SizedBox(height: 5),
                                   ],
                                 ),
                               ),
@@ -376,9 +383,11 @@ class UserScreen extends StatelessWidget {
           // controller.isLogged.toggle();
           // controller.isLogged.value ? controller.setMsg('user') : controller.setMsg('guest');
           // controller.setMessage('user');
+          /*
           user.profile.value.userName.isNotEmpty && user.profile.value.userName != 'guest'
               ? controller.setMessage('user')
               : controller.setMessage('guest');
+          */
 
           // TODO > persist user games
           user.addGameDialog();
