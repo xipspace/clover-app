@@ -62,7 +62,7 @@ class LottoController extends GetxController {
   String get formattedLastSingleTierDraw {
     final draws = getFilteredData().reversed;
     for (var draw in draws) {
-      final result = _analyzeTiersInDraw(draw.results);
+      final result = _generateTiersInDraw(draw.results);
       if (result['count'] == 1) {
         return 'last single tier draw: ${_formatDate(draw.date)}';
       }
@@ -73,7 +73,7 @@ class LottoController extends GetxController {
   String get formattedLastMultiTierDraw {
     final draws = getFilteredData().reversed;
     for (var draw in draws) {
-      final result = _analyzeTiersInDraw(draw.results);
+      final result = _generateTiersInDraw(draw.results);
       if (result['count'] > 1) {
         return 'last multi tier draw: ${_formatDate(draw.date)}';
       }
@@ -95,7 +95,7 @@ class LottoController extends GetxController {
     final found = <String>{};
 
     for (var draw in draws) {
-      final result = _analyzeTiersInDraw(draw.results);
+      final result = _generateTiersInDraw(draw.results);
       final Set<String> tierSet = result['tierSet'];
 
       for (var tier in tierSet) {
@@ -231,7 +231,7 @@ class LottoController extends GetxController {
     final tierCounts = {'t2': 0, 't3': 0, 't4': 0, 't5': 0, 't6': 0};
 
     for (var draw in draws) {
-      final result = _analyzeTiersInDraw(draw.results);
+      final result = _generateTiersInDraw(draw.results);
       final String? tier = result['highest'];
       if (tier != null) {
         tierCounts[tier] = tierCounts[tier]! + 1;
@@ -254,7 +254,7 @@ class LottoController extends GetxController {
     final tierCounts = {'t2': 0, 't3': 0, 't4': 0, 't5': 0, 't6': 0};
 
     for (var draw in draws) {
-      final result = _analyzeTiersInDraw(draw.results);
+      final result = _generateTiersInDraw(draw.results);
       final List<String> tiers = result['tiers'];
       for (var tier in tiers) {
         tierCounts[tier] = tierCounts[tier]! + 1;
@@ -278,7 +278,7 @@ class LottoController extends GetxController {
     int multi = 0;
 
     for (var draw in draws) {
-      final result = _analyzeTiersInDraw(draw.results);
+      final result = _generateTiersInDraw(draw.results);
       final int count = result['count'];
       if (count == 1) single++;
       if (count > 1) multi++;
@@ -341,39 +341,6 @@ class LottoController extends GetxController {
     return buffer.toString();
   }
 
-  String _generateRepeatedDraws(List<LottoDraw> draws) {
-    if (draws.isEmpty) return 'no draw data available';
-
-    final Map<String, List<LottoDraw>> groups = {};
-
-    for (final draw in draws) {
-      final key = (List<int>.from(draw.results)..sort()).join(',');
-      groups.putIfAbsent(key, () => []).add(draw);
-    }
-
-    final repeated = groups.values.where((g) => g.length > 1).toList();
-
-    if (repeated.isEmpty) {
-      return 'no repeated draw results found';
-    }
-
-    final buffer = StringBuffer();
-
-    for (final group in repeated) {
-      final numbers = group.first.results.map((n) => n.toString().padLeft(2, '0')).join(', ');
-
-      buffer.writeln('numbers: [$numbers]');
-
-      for (final draw in group) {
-        buffer.writeln('  - draw ${draw.drawNumber} (${_formatDate(draw.date)})');
-      }
-
-      buffer.writeln(); // group separator
-    }
-
-    return buffer.toString().trim();
-  }
-
   String _generateGroupRanking(List<LottoDraw> draws) {
     final Map<int, int> numberCounts = {};
 
@@ -424,12 +391,40 @@ class LottoController extends GetxController {
     return buffer.toString();
   }
 
-  String _formatDate(String raw) {
-    final parts = raw.split('_'); // ['2025', '05', '31']
-    return '${parts[2]}-${parts[1]}-${parts[0]}';
+  String _generateRepeatedDraws(List<LottoDraw> draws) {
+    if (draws.isEmpty) return 'no draw data available';
+
+    final Map<String, List<LottoDraw>> groups = {};
+
+    for (final draw in draws) {
+      final key = (List<int>.from(draw.results)..sort()).join(',');
+      groups.putIfAbsent(key, () => []).add(draw);
+    }
+
+    final repeated = groups.values.where((g) => g.length > 1).toList();
+
+    if (repeated.isEmpty) {
+      return 'no repeated draw results found';
+    }
+
+    final buffer = StringBuffer();
+
+    for (final group in repeated) {
+      final numbers = group.first.results.map((n) => n.toString().padLeft(2, '0')).join(', ');
+
+      buffer.writeln('numbers: [$numbers]');
+
+      for (final draw in group) {
+        buffer.writeln('  - draw ${draw.drawNumber} (${_formatDate(draw.date)})');
+      }
+
+      buffer.writeln(); // group separator
+    }
+
+    return buffer.toString().trim();
   }
 
-  Map<String, dynamic> _analyzeTiersInDraw(List<int> results) {
+  Map<String, dynamic> _generateTiersInDraw(List<int> results) {
     final sorted = List<int>.from(results)..sort();
     final streaks = <int>[];
 
@@ -458,6 +453,11 @@ class LottoController extends GetxController {
       'tierSet': tiers.toSet(),
       'count': tiers.length,
     };
+  }
+
+  String _formatDate(String raw) {
+    final parts = raw.split('_'); // ['2025', '05', '31']
+    return '${parts[2]}-${parts[1]}-${parts[0]}';
   }
 
   void loadLottoResults() async {
@@ -518,11 +518,33 @@ class UserController extends GetxController {
 
   // get dialog to provide pattern input
   void addGameDialog() {
+    String tempName = 'dummy';
+    int tempLength = 6;
+    List<int> tempNumbers = [1, 2, 3, 4, 5, 6];
     Get.dialog(
       AlertDialog(
-        title: Text('add new game'),
+        title: const Text('add new game'),
         // TODO > title, toggle number list and length selector
-        content: Text('content'),
+        // content: Text('content'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration: InputDecoration(labelText: 'title'),
+              onChanged: (value) => tempName = value,
+              controller: TextEditingController(text: tempName),
+            ),
+            // add length of the game selector
+            // add number list to toggle
+            /*
+            TextField(
+              decoration: InputDecoration(labelText: 'name'),
+              onChanged: (value) => snapshot.name = value,
+              controller: TextEditingController(text: snapshot.name),
+            ),
+            */
+          ],
+        ),
         actions: [
           TextButton(
             onPressed: () => Get.back(),
@@ -531,7 +553,7 @@ class UserController extends GetxController {
           TextButton(
             onPressed: () {
               // add user game with selection
-              final userGame = UserGame(name: 'Test Game', length: 6, numbers: const [1, 2, 3, 4, 5, 6], createdAt: DateTime.now());
+              final userGame = UserGame(name: tempName, length: tempLength, numbers: tempNumbers, createdAt: DateTime.now());
               addGame(userGame);
               Get.back();
             },
@@ -541,6 +563,48 @@ class UserController extends GetxController {
       ),
     );
   }
+
+  /*
+  void showEdit(Snapshot snapshot) {
+    final originalId = snapshot.id;
+    Get.dialog(
+      AlertDialog(
+        title: Text('edit'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              decoration: InputDecoration(labelText: 'title'),
+              onChanged: (value) => snapshot.title = value,
+              controller: TextEditingController(text: snapshot.title),
+            ),
+            TextField(
+              decoration: InputDecoration(labelText: 'name'),
+              onChanged: (value) => snapshot.name = value,
+              controller: TextEditingController(text: snapshot.name),
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Get.back();
+            },
+            child: const Column(children: [SizedBox(width: 50), Text('cancel')]),
+          ),
+          TextButton(
+            onPressed: () {
+              snapshots[originalId] = snapshot;
+              snapshots.refresh();
+              Get.back();
+            },
+            child: const Column(children: [SizedBox(width: 50), Text('OK')]),
+          ),
+        ],
+      ),
+    );
+  }
+  */
   
 }
 
