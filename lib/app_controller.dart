@@ -518,93 +518,84 @@ class UserController extends GetxController {
 
   // get dialog to provide pattern input
   void addGameDialog() {
-    String tempName = 'dummy';
-    int tempLength = 6;
-    List<int> tempNumbers = [1, 2, 3, 4, 5, 6];
+    final nameController = TextEditingController(text: 'Lotto Game');
+
+    final RxInt tempLength = 6.obs;
+    final RxList<int> tempNumbers = <int>[1, 2, 3, 4, 5, 6].obs;
+
+    void syncNumbers() {
+      tempNumbers.value = List.generate(tempLength.value, (i) => i + 1);
+    }
+
     Get.dialog(
       AlertDialog(
-        title: const Text('add new game'),
-        // TODO > title, toggle number list and length selector
-        // content: Text('content'),
+        title: const Text('Add New Game'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            TextField(
-              decoration: InputDecoration(labelText: 'title'),
-              onChanged: (value) => tempName = value,
-              controller: TextEditingController(text: tempName),
-            ),
-            // add length of the game selector
-            // add number list to toggle
-            /*
-            TextField(
-              decoration: InputDecoration(labelText: 'name'),
-              onChanged: (value) => snapshot.name = value,
-              controller: TextEditingController(text: snapshot.name),
-            ),
-            */
+            
+            // game name selector
+            TextField(controller: nameController),
+
+            const SizedBox(height: 10.0),
+            const SizedBox(width: 400.0),
+
+            // length selector
+            Obx(() {
+              return Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  const Text('Game size'),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: const Icon(Icons.remove),
+                        onPressed:
+                            tempLength.value > 6
+                                ? () {
+                                  tempLength.value--;
+                                  syncNumbers();
+                                }
+                                : null,
+                      ),
+                      SizedBox(width: 60, child: Text(tempLength.value.toString(), textAlign: TextAlign.center)),
+                      IconButton(
+                        icon: const Icon(Icons.add),
+                        onPressed:
+                            tempLength.value < 20
+                                ? () {
+                                  tempLength.value++;
+                                  syncNumbers();
+                                }
+                                : null,
+                      ),
+                    ],
+                  ),
+                ],
+              );
+            }),
           ],
         ),
         actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Column(children: [SizedBox(width: 50), Text('cancel')]),
-          ),
+          TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
           TextButton(
             onPressed: () {
-              // add user game with selection
-              final userGame = UserGame(name: tempName, length: tempLength, numbers: tempNumbers, createdAt: DateTime.now());
+              final userGame = UserGame(
+                name: nameController.text,
+                length: tempLength.value,
+                numbers: tempNumbers.toList(),
+                createdAt: DateTime.now(),
+              );
+
               addGame(userGame);
               Get.back();
             },
-            child: const Column(children: [SizedBox(width: 50), Text('OK')]),
+            child: const Text('OK'),
           ),
         ],
       ),
     );
   }
-
-  /*
-  void showEdit(Snapshot snapshot) {
-    final originalId = snapshot.id;
-    Get.dialog(
-      AlertDialog(
-        title: Text('edit'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              decoration: InputDecoration(labelText: 'title'),
-              onChanged: (value) => snapshot.title = value,
-              controller: TextEditingController(text: snapshot.title),
-            ),
-            TextField(
-              decoration: InputDecoration(labelText: 'name'),
-              onChanged: (value) => snapshot.name = value,
-              controller: TextEditingController(text: snapshot.name),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () {
-              Get.back();
-            },
-            child: const Column(children: [SizedBox(width: 50), Text('cancel')]),
-          ),
-          TextButton(
-            onPressed: () {
-              snapshots[originalId] = snapshot;
-              snapshots.refresh();
-              Get.back();
-            },
-            child: const Column(children: [SizedBox(width: 50), Text('OK')]),
-          ),
-        ],
-      ),
-    );
-  }
-  */
   
 }
 
