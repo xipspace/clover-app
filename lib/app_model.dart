@@ -24,16 +24,16 @@ class LottoNumber {
 class LottoDraw {
   final String drawNumber;
   final String date;
-  final List<int> results;
+  final Set<int> results;
 
   LottoDraw({required this.drawNumber, required this.date, required this.results});
 
   factory LottoDraw.fromJson(String drawNumber, Map<String, dynamic> json) {
-    return LottoDraw(drawNumber: drawNumber, date: json['date'], results: List<int>.from(json['result']));
+    return LottoDraw(drawNumber: drawNumber, date: json['date'], results: Set<int>.from(json['result']));
   }
 
   Map<String, dynamic> toJson() {
-    return {'date': date, 'result': results};
+    return {'date': date, 'result': results.toList()};
   }
 }
 
@@ -84,19 +84,19 @@ class UserProfile {
 class UserGame {
   final String name;
   final int length;
-  final List<int> numbers;
+  final Set<int> numbers;
   final DateTime createdAt;
 
   UserGame({required this.name, required this.length, required this.numbers, required this.createdAt})
     : assert(length >= 6 && length <= 20, 'size must be between 6 and 20'),
       assert(numbers.length == length, 'numbers length must match size ($length)'),
-      assert(numbers.toSet().length == numbers.length, 'numbers must not contain duplicates'),
+      // assert(numbers.toSet().length == numbers.length, 'numbers must not contain duplicates'),
       assert(numbers.every((n) => n >= 1 && n <= 60), 'numbers must be between 1 and 60 inclusive');
 
   factory UserGame.fromJson(Map<String, dynamic> json) {
-    return UserGame(name: json['name'], length: json['size'], numbers: List<int>.from(json['numbers']), createdAt: DateTime.parse(json['createdAt']));
+    return UserGame(name: json['name'], length: json['size'], numbers: Set<int>.from(json['numbers']), createdAt: DateTime.parse(json['createdAt']));
   }
 
-  Map<String, dynamic> toJson() => {'name': name, 'size': length, 'numbers': numbers, 'createdAt': createdAt.toIso8601String()};
+  Map<String, dynamic> toJson() => {'name': name, 'size': length, 'numbers': numbers.toList(), 'createdAt': createdAt.toIso8601String()};
 }
 

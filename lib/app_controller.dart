@@ -424,8 +424,9 @@ class LottoController extends GetxController {
     return buffer.toString().trim();
   }
 
-  Map<String, dynamic> _generateTiersInDraw(List<int> results) {
-    final sorted = List<int>.from(results)..sort();
+  Map<String, dynamic> _generateTiersInDraw(Iterable<int> results) {
+    // final sorted = List<int>.from(results)..sort();
+    final sorted = results.toList()..sort();
     final streaks = <int>[];
 
     int currentStreak = 1;
@@ -521,10 +522,14 @@ class UserController extends GetxController {
     final nameController = TextEditingController(text: 'Lotto Game');
 
     final RxInt tempLength = 6.obs;
-    final RxList<int> tempNumbers = <int>[1, 2, 3, 4, 5, 6].obs;
+    final RxSet<int> tempNumbers = <int>{1, 2, 3, 4, 5, 6}.obs;
 
     void syncNumbers() {
-      tempNumbers.value = List.generate(tempLength.value, (i) => i + 1);
+      // If we decrease the size, we need to trim the set
+      if (tempNumbers.length > tempLength.value) {
+        final List<int> currentList = tempNumbers.toList();
+        tempNumbers.assignAll(currentList.take(tempLength.value).toSet());
+      }
     }
 
     Get.dialog(
@@ -533,14 +538,9 @@ class UserController extends GetxController {
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            
-            // game name selector
-            TextField(controller: nameController),
+            const SizedBox(height: 10.0, width: 360.0),
 
-            const SizedBox(height: 10.0),
-            const SizedBox(width: 400.0),
-
-            // length selector
+            // Game Size Selector
             Obx(() {
               return Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -558,14 +558,13 @@ class UserController extends GetxController {
                                 }
                                 : null,
                       ),
-                      SizedBox(width: 60, child: Text(tempLength.value.toString(), textAlign: TextAlign.center)),
+                      SizedBox(width: 40, child: Text(tempLength.value.toString(), textAlign: TextAlign.center)),
                       IconButton(
                         icon: const Icon(Icons.add),
                         onPressed:
                             tempLength.value < 20
                                 ? () {
                                   tempLength.value++;
-                                  syncNumbers();
                                 }
                                 : null,
                       ),
@@ -574,23 +573,76 @@ class UserController extends GetxController {
                 ],
               );
             }),
+
+            TextField(decoration: const InputDecoration(labelText: 'Title'), controller: nameController),
+
+            const SizedBox(height: 20.0),
+
+            // Selection Progress
+            Obx(
+              () => Text(
+                'Selected: ${tempNumbers.length} / ${tempLength.value}',
+                // style: TextStyle(color: tempNumbers.length == tempLength.value ? Colors.green : Colors.red, fontWeight: FontWeight.bold),
+              ),
+            ),
+
+            const SizedBox(height: 20.0),
+
+            // Toggable Grid
+            SizedBox(
+              width: 500.0,
+              height: 300.0,
+              child: GridView.builder(
+                itemCount: 60,
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 10, mainAxisSpacing: 5, crossAxisSpacing: 5),
+                itemBuilder: (context, index) {
+                  final number = index + 1;
+                  return Obx(() {
+                    final isSelected = tempNumbers.contains(number);
+                    return InkWell(
+                      onTap: () {
+                        if (isSelected) {
+                          tempNumbers.remove(number);
+                        } else if (tempNumbers.length < tempLength.value) {
+                          tempNumbers.add(number);
+                        }
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(color: isSelected ? Colors.green : Colors.white, borderRadius: BorderRadius.circular(4)),
+                        child: Center(
+                          child: Text(
+                            number.toString().padLeft(2, '0'),
+                            style: TextStyle(color: isSelected ? Colors.white : Colors.black, fontSize: 14.0),
+                          ),
+                        ),
+                      ),
+                    );
+                  });
+                },
+              ),
+            ),
           ],
         ),
         actions: [
           TextButton(onPressed: () => Get.back(), child: const Text('Cancel')),
-          TextButton(
-            onPressed: () {
-              final userGame = UserGame(
-                name: nameController.text,
-                length: tempLength.value,
-                numbers: tempNumbers.toList(),
-                createdAt: DateTime.now(),
-              );
-
-              addGame(userGame);
-              Get.back();
-            },
-            child: const Text('OK'),
+          Obx(
+            () => TextButton(
+              // Only allow "OK" if the set is exactly the right size
+              onPressed:
+                  tempNumbers.length == tempLength.value
+                      ? () {
+                        final userGame = UserGame(
+                          name: nameController.text,
+                          length: tempLength.value,
+                          numbers: tempNumbers,
+                          createdAt: DateTime.now(),
+                        );
+                        addGame(userGame);
+                        Get.back();
+                      }
+                      : null,
+              child: const Text('OK'),
+            ),
           ),
         ],
       ),
