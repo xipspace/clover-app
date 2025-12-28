@@ -540,18 +540,24 @@ class UserController extends GetxController {
 
     Get.dialog(
       AlertDialog(
-        title: const Text('Add New Game'),
+        // title: const Text('Add New Game'),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             const SizedBox(height: 10.0, width: 360.0),
+            Text('Add New Game'),
+            // Divider(),
+            TextField(decoration: const InputDecoration(labelText: 'Title'), controller: nameController),
+
+            const SizedBox(height: 10.0),
 
             // Game Size Selector
             Obx(() {
               return Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                // mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   const Text('Game size'),
+                  Spacer(),
                   Row(
                     children: [
                       IconButton(
@@ -580,9 +586,7 @@ class UserController extends GetxController {
               );
             }),
 
-            TextField(decoration: const InputDecoration(labelText: 'Title'), controller: nameController),
-
-            const SizedBox(height: 20.0),
+            // const SizedBox(height: 20.0),
 
             // Selection Progress
             Obx(
