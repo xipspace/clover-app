@@ -532,6 +532,12 @@ class UserController extends GetxController {
       }
     }
 
+    void clearSelection() {
+      tempNumbers.clear();
+    }
+
+    clearSelection();
+
     Get.dialog(
       AlertDialog(
         title: const Text('Add New Game'),
@@ -580,9 +586,19 @@ class UserController extends GetxController {
 
             // Selection Progress
             Obx(
-              () => Text(
-                'Selected: ${tempNumbers.length} / ${tempLength.value}',
-                // style: TextStyle(color: tempNumbers.length == tempLength.value ? Colors.green : Colors.red, fontWeight: FontWeight.bold),
+              () => Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Selected: ${tempNumbers.length} / ${tempLength.value}',
+                    // style: TextStyle(color: tempNumbers.length == tempLength.value ? Colors.green : Colors.red, fontWeight: FontWeight.bold),
+                  ),
+                  TextButton.icon(
+                    onPressed: tempNumbers.isNotEmpty ? clearSelection : null,
+                    icon: const Icon(Icons.restart_alt_rounded, size: 20.0),
+                    label: const Text('Restart'),
+                  ),
+                ],
               ),
             ),
 
@@ -594,12 +610,18 @@ class UserController extends GetxController {
               height: 300.0,
               child: GridView.builder(
                 itemCount: 60,
-                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(crossAxisCount: 10, mainAxisSpacing: 5, crossAxisSpacing: 5),
+                gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 10,
+                  mainAxisSpacing: 8,
+                  crossAxisSpacing: 8,
+                ),
                 itemBuilder: (context, index) {
                   final number = index + 1;
                   return Obx(() {
                     final isSelected = tempNumbers.contains(number);
                     return InkWell(
+                      // circular splash effect to match the container
+                      customBorder: const CircleBorder(),
                       onTap: () {
                         if (isSelected) {
                           tempNumbers.remove(number);
@@ -608,11 +630,18 @@ class UserController extends GetxController {
                         }
                       },
                       child: Container(
-                        decoration: BoxDecoration(color: isSelected ? Colors.green : Colors.white, borderRadius: BorderRadius.circular(4)),
+                        decoration: BoxDecoration(
+                          color: isSelected ? Colors.yellow.shade500 : Colors.white,
+                          shape: BoxShape.circle,
+                          border: Border.all(color: isSelected ? Colors.grey.shade300 : Colors.white, width: 1),
+                        ),
                         child: Center(
                           child: Text(
                             number.toString().padLeft(2, '0'),
-                            style: TextStyle(color: isSelected ? Colors.white : Colors.black, fontSize: 14.0),
+                            style: TextStyle(
+                              // color: isSelected ? Colors.white : Colors.black,
+                              fontSize: 14.0,
+                            ),
                           ),
                         ),
                       ),
