@@ -122,7 +122,7 @@ class InfoScreen extends StatelessWidget {
                 const SizedBox(height: 10),
                 Text('draws: ${lotto.lottoData.length.toString()}'),
                 Text(lotto.formattedLastDraw),
-                Text('last result: ${lotto.lottoData.last.results.toString()}'),
+                Text('last result: ${lotto.lottoData.last.formattedResults}'),
                 const SizedBox(height: 20),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,

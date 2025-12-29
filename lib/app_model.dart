@@ -40,6 +40,8 @@ class LottoDraw {
     final parts = date.split('_').map(int.parse).toList();
     return DateTime(parts[0], parts[1], parts[2]);
   }
+
+  String get formattedResults => (results.toList()..sort()).map((n) => n.toString().padLeft(2, '0')).join(', ');
 }
 
 class LottoHistory {
