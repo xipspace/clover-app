@@ -29,7 +29,6 @@ class HomeController extends GetxController {
 enum ViewMode { drawResults, frequencyTable, frequencyRanking, groupRanking, sequenceTiers, repeatedDraws }
 enum TimeFilter { allTime, oneMonth, sixMonths, oneYear, fiveYears }
 
-// TODO > add helper to iterate for same draws (and their number/date)
 class LottoController extends GetxController {
   RxString lottoBanner = 'void'.obs;
   RxList<LottoDraw> lottoData = <LottoDraw>[].obs;
@@ -512,8 +511,6 @@ class LottoController extends GetxController {
   }
 }
 
-
-// TODO > extend helper that iterate for same draws (and their number/date) with user selection
 class UserController extends GetxController {
   // add user object to factory game with combinations of numbers to be compared with lotto data
   final Rx<UserProfile> profile = UserProfile(userName: 'guest', games: []).obs;

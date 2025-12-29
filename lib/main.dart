@@ -344,7 +344,7 @@ class UserScreen extends StatelessWidget {
                                   children: [
                                     Row(
                                       children: [
-                                        Text(game.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                        Text(game.name),
                                         const Spacer(),
                                         IconButton(iconSize: 15.0, icon: const Icon(Icons.close), onPressed: () => user.deleteGame(game)),
                                       ],
