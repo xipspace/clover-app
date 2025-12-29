@@ -35,6 +35,11 @@ class LottoDraw {
   Map<String, dynamic> toJson() {
     return {'date': date, 'result': results.toList()};
   }
+
+  DateTime get dateTime {
+    final parts = date.split('_').map(int.parse).toList();
+    return DateTime(parts[0], parts[1], parts[2]);
+  }
 }
 
 class LottoHistory {
@@ -98,5 +103,7 @@ class UserGame {
   }
 
   Map<String, dynamic> toJson() => {'name': name, 'size': length, 'numbers': numbers.toList(), 'createdAt': createdAt.toIso8601String()};
+
+  String get formattedNumbers => (numbers.toList()..sort()).map((n) => n.toString().padLeft(2, '0')).join(', ');
 }
 

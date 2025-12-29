@@ -279,7 +279,7 @@ class UserScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final controller = Get.find<HomeController>();
     final user = Get.find<UserController>();
-    // final lotto = Get.find<LottoController>();
+    final lotto = Get.find<LottoController>();
     final MediaQueryData mediaQueryData = MediaQuery.of(context);
 
     return Scaffold(
@@ -315,22 +315,24 @@ class UserScreen extends StatelessWidget {
                 Text('Device Theme: ${mediaQueryData.platformBrightness}'),
 
                 Text('GetX isDarkMode: ${Get.isDarkMode}'),
-
                 // Obx(() => Text('isLight: ${controller.isLight}')),
+
                 // width: Get.width * 0.95,
                 // height: Get.height * 0.95,
-                // Obx(() => Text('username: ${user.profile.value.userName.toString()}')),
+                
                 const SizedBox(height: 20),
                 Obx(() => Text('username: ${user.profile.value.userName}')),
                 Obx(() => Text('games: ${user.profile.value.games.length.toString()}')),
                 const SizedBox(height: 20),
-              
+
                 Obx(() {
                   final games = user.profile.value.games;
+                  if (games.isEmpty) return const Text('Create a new game.');
 
                   return Column(
                     children:
                         games.map((game) {
+
                           return Card(
                             child: Container(
                               decoration: BoxDecoration(color: Colors.green.shade50, borderRadius: BorderRadius.circular(12)),
@@ -342,24 +344,18 @@ class UserScreen extends StatelessWidget {
                                   children: [
                                     Row(
                                       children: [
-                                        Text(game.name),
-                                        Spacer(),
-                                        Tooltip(
-                                          message: 'delete',
-                                          child: IconButton(
-                                            iconSize: 15.0,
-                                            icon: Icon(Icons.close),
-                                            onPressed: () => user.deleteGame(game),
-                                          ),
-                                        ),
+                                        Text(game.name, style: const TextStyle(fontWeight: FontWeight.bold)),
+                                        const Spacer(),
+                                        IconButton(iconSize: 15.0, icon: const Icon(Icons.close), onPressed: () => user.deleteGame(game)),
                                       ],
                                     ),
-                                    Divider(),
+                                    const Divider(),
                                     const SizedBox(height: 5),
                                     Text('size: ${game.length}'),
-                                    Text('numbers: ${game.numbers.join(', ')}'),
+                                    Text('numbers: ${game.formattedNumbers}'),
                                     Text('created: ${game.createdAt.toIso8601String()}'),
-                                    Text('statistics: [tbd]'),
+                                    Text(lotto.userGameStatistics(game.numbers)),
+
                                     const SizedBox(height: 5),
                                   ],
                                 ),
@@ -380,14 +376,6 @@ class UserScreen extends StatelessWidget {
         child: const Icon(Icons.add),
         onPressed: () {
           controller.setStamp();
-          // controller.isLogged.toggle();
-          // controller.isLogged.value ? controller.setMsg('user') : controller.setMsg('guest');
-          // controller.setMessage('user');
-          /*
-          user.profile.value.userName.isNotEmpty && user.profile.value.userName != 'guest'
-              ? controller.setMessage('user')
-              : controller.setMessage('guest');
-          */
 
           // TODO > persist user games
           user.addGameDialog();

@@ -456,6 +456,32 @@ class LottoController extends GetxController {
     };
   }
 
+  String userGameStatistics(Set<int> gameNumbers) {
+    if (lottoData.isEmpty) return 'statistics: no draw data';
+
+    final hits = <String>[];
+    int highest = 0;
+    final labels = {6: 'sena', 5: 'quina', 4: 'quadra'};
+
+    for (final draw in lottoData) {
+      final matchedSet = gameNumbers.intersection(draw.results.toSet());
+      final count = matchedSet.length;
+
+      if (count > highest) highest = count;
+
+      if (count >= 4) {
+        final sortedMatched = matchedSet.toList()..sort();
+        final winnerNumbers = sortedMatched.map((n) => n.toString().padLeft(2, '0')).join(', ');
+
+        hits.add('[ $winnerNumbers ] at draw ${draw.drawNumber} (${_formatDate(draw.date)}) ${labels[count]}');
+      }
+    }
+
+    if (hits.isNotEmpty) return 'statistics:\n${hits.join('\n')}';
+
+    return highest >= 3 ? 'highest match: $highest numbers' : 'no significant matches';
+  }
+
   String _formatDate(String raw) {
     final parts = raw.split('_'); // ['2025', '05', '31']
     return '${parts[2]}-${parts[1]}-${parts[0]}';
@@ -525,7 +551,7 @@ class UserController extends GetxController {
     final RxSet<int> tempNumbers = <int>{1, 2, 3, 4, 5, 6}.obs;
 
     void syncNumbers() {
-      // If we decrease the size, we need to trim the set
+      // when decrease the size, trim the set
       if (tempNumbers.length > tempLength.value) {
         final List<int> currentList = tempNumbers.toList();
         tempNumbers.assignAll(currentList.take(tempLength.value).toSet());
